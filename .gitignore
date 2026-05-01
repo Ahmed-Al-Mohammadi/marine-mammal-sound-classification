@@ -1,0 +1,18 @@
+# Large files
+cache/
+models/
+mlruns/
+DataSet/
+*.pth
+*.pkl
+*.npz
+*.pt
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# System
+.DS_Store
+Thumbs.db
