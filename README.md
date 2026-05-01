@@ -37,15 +37,19 @@
 ## 🧠 Models
 
 ### Deep Learning (PyTorch)
-- **CustomCNN** — 4.9M parameters, 5 ConvBlocks + GAP
-- **ResidualCNN** — 3.2M parameters, Skip Connections
-- **LightCNN** — 145K parameters, Depthwise Separable Convolutions
+
+| Model | Parameters | Architecture |
+|-------|-----------|-------------|
+| CustomCNN | 4.9M | 5 ConvBlocks + Global Average Pooling |
+| ResidualCNN | 3.2M | Skip Connections (ResNet-style) |
+| LightCNN | 145K | Depthwise Separable Convolutions |
 
 ### Machine Learning (sklearn + From Scratch)
-Built **6 algorithms completely from scratch** (no sklearn):
 
-| Algorithm | Built-in | From Scratch |
-|-----------|----------|-------------|
+Built **6 algorithms completely from scratch** without sklearn:
+
+| Algorithm | Built-in (sklearn) | From Scratch |
+|-----------|:-----------------:|:------------:|
 | KNN | ✅ | ✅ |
 | Naive Bayes | ✅ | ✅ |
 | Logistic Regression | ✅ | ✅ |
@@ -56,58 +60,88 @@ Built **6 algorithms completely from scratch** (no sklearn):
 ---
 
 ## 🔧 Pipeline
+
+```
 WAV Files (15,234)
-↓
+        │
+        ▼
 Mel Spectrogram (128 × 216)
-↓
-┌──────────────────┬──────────────────┐
-│   DL Pipeline    │   ML Pipeline    │
-│   3 CNN Models   │  774 Features    │
-│   PyTorch + GPU  │  9 ML Models     │
-└──────────────────┴──────────────────┘
-↓
-MLflow Tracking + SHAP Analysis
+        │
+        ├─────────────────────┬─────────────────────┐
+        │                     │                     │
+        ▼                     ▼                     │
+  DL Pipeline           ML Pipeline                 │
+  ─────────────         ─────────────               │
+  3 CNN Models          774 Features                │
+  PyTorch + GPU         9 ML Models                 │
+        │                     │                     │
+        └──────────┬──────────┘                     │
+                   ▼                                 │
+     MLflow Tracking + SHAP Analysis                │
+```
+
 ---
 
 ## 📊 Key Visualizations
 
-| Mel Spectrograms | Training Curves |
-|-----------------|-----------------|
-| ![mel](figures/mel_spectrograms.png) | ![curves](figures/dl_training_curves.png) |
+### Mel Spectrograms — One Example per Taxonomic Group
+![Mel Spectrograms](figures/mel_spectrograms.png)
 
-| Confusion Matrix | SHAP Analysis |
-|-----------------|---------------|
-| ![cm](figures/confusion_matrix_ResidualCNN.png) | ![shap](figures/shap_feature_importance.png) |
+### DL Training Curves — All Models
+![Training Curves](figures/dl_training_curves.png)
+
+### Confusion Matrix — ResidualCNN (Test Set)
+![Confusion Matrix](figures/confusion_matrix_ResidualCNN.png)
+
+### SHAP Feature Importance — Extra Trees
+![SHAP Analysis](figures/shap_feature_importance.png)
+
+### Built-in vs From Scratch Comparison
+![Comparison](figures/builtin_vs_scratch.png)
 
 ---
 
 ## 🚀 Quick Start
 
 ```bash
-# Install dependencies
+# 1. Clone the repository
+git clone https://github.com/Ahmed-Al-Mohammadi/marine-mammal-sound-classification.git
+cd marine-mammal-sound-classification
+
+# 2. Install dependencies
 pip install -r requirements.txt
 
-# Download dataset
+# 3. Download dataset
 # https://cis.whoi.edu/science/B/whalesounds/
 
-# Run notebook
-jupyter notebook MarineMammal_Classification.ipynb
+# 4. Run notebook
+jupyter notebook Code/MarineMammal_Classification.ipynb
 ```
 
 ---
 
 ## 📁 Project Structure
+
+```
 marine-mammal-sound-classification/
-├── MarineMammal_Classification.ipynb  # Main notebook
-├── class_labels_indices_whales.csv    # Species labels
-├── requirements.txt
-├── figures/                           # All visualizations
+│
+├── Code/
+│   ├── MarineMammal_Classification.ipynb   ← Main notebook
+│   └── class_labels_indices_whales.csv     ← Species labels (47 classes)
+│
+├── figures/
 │   ├── mel_spectrograms.png
 │   ├── dl_training_curves.png
 │   ├── confusion_matrix_ResidualCNN.png
 │   ├── shap_feature_importance.png
-│   └── builtin_vs_scratch.png
+│   ├── builtin_vs_scratch.png
+│   ├── imbalance_analysis.png
+│   └── final_ranking.png
+│
+├── requirements.txt
+├── .gitignore
 └── README.md
+```
 
 ---
 
@@ -115,8 +149,22 @@ marine-mammal-sound-classification/
 
 - **High-frequency Mel bins (119-127)** are the most important features — biologically valid since dolphins & whales vocalize in ultrasonic ranges
 - **ResidualCNN** outperforms all models due to skip connections preventing vanishing gradients
-- **529x class imbalance** handled via WeightedRandomSampler
+- **529x class imbalance** handled via `WeightedRandomSampler`
 - Training time reduced from **300+ min → 40 sec/epoch** via Mel Spectrogram caching
+- **Naive Bayes from scratch** (57%) outperformed sklearn (36%) because PCA features satisfy the independence assumption
+
+---
+
+## ⚙️ Tech Stack
+
+| Category | Tools |
+|----------|-------|
+| Deep Learning | PyTorch, torchaudio |
+| Classical ML | scikit-learn |
+| Experiment Tracking | MLflow |
+| Explainability | SHAP |
+| Visualization | Plotly, Matplotlib, Seaborn |
+| Audio Processing | torchaudio, MelSpectrogram |
 
 ---
 
@@ -124,9 +172,11 @@ marine-mammal-sound-classification/
 
 **Watkins Marine Mammal Sound Database**
 Woods Hole Oceanographic Institution (WHOI)
+
 - ~2,000 unique recordings
-- 60+ species
-- Recordings from 1940s–2000s
+- 60+ species (47 used after filtering)
+- Recordings spanning 1940s–2000s
+- First recordings of 51 species ever made
 
 🔗 [Dataset Link](https://cis.whoi.edu/science/B/whalesounds/)
 
